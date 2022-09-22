@@ -1,0 +1,48 @@
+node-ipaddr.js (2.0.0~dfsg-1) unstable; urgency=medium
+
+  * Team upload
+
+  [ Debian Janitor ]
+  * Use secure copyright file specification URI.
+  * Bump debhelper from deprecated 8 to 12.
+  * Set debhelper-compat version in Build-Depends.
+  * Change priority extra to priority optional.
+  * Set upstream metadata fields: Bug-Database, Bug-Submit, Repository,
+    Repository-Browse.
+  * Remove unnecessary XS-Testsuite field in debian/control.
+  * Update Vcs-* headers to use salsa repository.
+  * Apply multi-arch hints.
+    + libjs-ipaddr, node-ipaddr.js: Add Multi-Arch: foreign.
+
+  [ Xavier Guimard ]
+  * Bump debhelper compatibility level to 13
+  * Declare compliance with policy 4.5.1
+  * Add "Rules-Requires-Root: no"
+  * Change section to javascript
+  * Add debian/gbp.conf
+  * Modernize debian/watch
+  * Use dh-sequence-nodejs auto install (Closes: #974251)
+  * Exclude minified file from import
+  * New upstream version 2.0.0~dfsg
+  * Drop patch
+  * Build with uglifyjs.terser instead of outdated node-uglify
+  * Enable upstream test using mocha
+
+ -- Xavier Guimard <yadd@debian.org>  Wed, 23 Dec 2020 12:55:44 +0100
+
+node-ipaddr.js (0.1.3-1) unstable; urgency=medium
+
+  * Imported Upstream version 0.1.3
+  * Bump Standards-Version 3.9.6
+  * debian/copyright: removed Files-Excluded field.
+    Do not exclude files can be regenerated at build time.
+  * debian/source/lintian-overrides: override false positive for
+    missing source of ipaddr.min.js.
+
+ -- Leo Iannacone <l3on@ubuntu.com>  Sun, 12 Oct 2014 01:51:52 +0200
+
+node-ipaddr.js (0.1.2+dfsg-1) unstable; urgency=low
+
+  * Initial release (Closes: #753804)
+
+ -- Leo Iannacone <l3on@ubuntu.com>  Sat, 05 Jul 2014 17:49:16 +0200

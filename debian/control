@@ -1,0 +1,41 @@
+Source: node-ipaddr.js
+Section: javascript
+Priority: optional
+Maintainer: Debian Javascript Maintainers <pkg-javascript-devel@lists.alioth.debian.org>
+Uploaders: Leo Iannacone <l3on@ubuntu.com>
+Build-Depends: , debhelper-compat (= 13)
+ , dh-sequence-nodejs
+ , mocha <!nocheck>
+ , uglifyjs.terser
+Standards-Version: 4.5.1
+Vcs-Browser: https://salsa.debian.org/js-team/node-ipaddr.js
+Vcs-Git: https://salsa.debian.org/js-team/node-ipaddr.js.git
+Homepage: https://github.com/whitequark/ipaddr.js
+Testsuite: autopkgtest-pkg-nodejs
+Rules-Requires-Root: no
+
+Package: node-ipaddr.js
+Architecture: all
+Depends: ${misc:Depends}
+ , nodejs
+Multi-Arch: foreign
+Description: IPv4 and IPv6 addresses manipulation - Node.js module
+ This modules features:
+  - verification and parsing of an IP address
+  - match against a CIDR range or range list
+  - match against reserved ranges like loopback or private ranges
+  - conversion between IPv4 and IPv4-mapped IPv6 addresses.
+ .
+ Node.js is an event-based server-side JavaScript engine.
+
+Package: libjs-ipaddr
+Architecture: all
+Depends: ${misc:Depends}
+Recommends: javascript-common
+Multi-Arch: foreign
+Description: IPv4 and IPv6 addresses manipulation - JavaScript library
+ This modules features:
+  - verification and parsing of an IP address
+  - match against a CIDR range or range list
+  - match against reserved ranges like loopback or private ranges
+  - conversion between IPv4 and IPv4-mapped IPv6 addresses.
