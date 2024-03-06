@@ -1,6 +1,7 @@
 'use strict';
 
 const assert = require('assert');
+const { IPv6, IPv4 } = require('../lib/ipaddr');
 
 const ipaddr = require('../lib/ipaddr');
 
@@ -33,6 +34,11 @@ describe('ipaddr', () => {
         let addr = new ipaddr.IPv4([192, 168, 1, 1]);
         assert.equal(addr.toString(), '192.168.1.1');
         assert.equal(addr.toNormalizedString(), '192.168.1.1');
+        done();
+    })
+
+    it('converts IPv4 CIDR to string correctly', (done) => {
+        assert.equal(IPv4.parseCIDR('192.168.1.1/24').toString(), '192.168.1.1/24');
         done();
     })
 
@@ -209,13 +215,21 @@ describe('ipaddr', () => {
         assert.equal(new ipaddr.IPv6([0, 0, 0, 0, 0, 0, 0, 0]).toString(), '::');
         assert.equal(new ipaddr.IPv6([0, 0, 0, 0, 0, 0, 0, 1]).toString(), '::1');
         assert.equal(new ipaddr.IPv6([0x2001, 0xdb8, 0, 0, 0, 0, 0, 0]).toString(), '2001:db8::');
-        assert.equal(new ipaddr.IPv6([0, 0xff, 0, 0, 0, 0, 0, 0]).toString(), '::ff:0:0:0:0:0:0');
+        assert.equal(new ipaddr.IPv6([0, 0xff, 0, 0, 0, 0, 0, 0]).toString(), '0:ff::');
         assert.equal(new ipaddr.IPv6([0, 0, 0, 0, 0, 0, 0xff, 0]).toString(), '::ff:0');
-        assert.equal(new ipaddr.IPv6([0, 0, 0xff, 0, 0, 0, 0, 0]).toString(), '::ff:0:0:0:0:0');
+        assert.equal(new ipaddr.IPv6([0, 0, 0xff, 0, 0, 0, 0, 0]).toString(), '0:0:ff::');
         assert.equal(new ipaddr.IPv6([0, 0, 0, 0, 0, 0xff, 0, 0]).toString(), '::ff:0:0');
+        assert.equal(new ipaddr.IPv6([0, 0, 0, 0xff, 0xff, 0, 0, 0]).toString(), '::ff:ff:0:0:0');
         assert.equal(new ipaddr.IPv6([0x2001, 0xdb8, 0xff, 0xabc, 0xdef, 0x123b, 0x456c, 0x78d]).toString(), '2001:db8:ff:abc:def:123b:456c:78d');
-        assert.equal(new ipaddr.IPv6([0x2001, 0xdb8, 0xff, 0xabc, 0, 0x123b, 0x456c, 0x78d]).toString(), '2001:db8:ff:abc::123b:456c:78d');
+        assert.equal(new ipaddr.IPv6([0x2001, 0xdb8, 0xff, 0xabc, 0, 0x123b, 0x456c, 0x78d]).toString(), '2001:db8:ff:abc:0:123b:456c:78d');
         assert.equal(new ipaddr.IPv6([0x2001, 0xdb8, 0xff, 0xabc, 0, 0, 0x456c, 0x78d]).toString(), '2001:db8:ff:abc::456c:78d');
+        done();
+    })
+
+    it('converts IPv6 CIDR to string correctly', (done) => {
+        assert.equal(IPv6.parseCIDR('0:0:0:0:0:0:0:0/64').toString(), '::/64');
+        assert.equal(IPv6.parseCIDR('0:0:0:ff:ff:0:0:0/64').toString(), '::ff:ff:0:0:0/64');
+        assert.equal(IPv6.parseCIDR('2001:db8:ff:abc:def:123b:456c:78d/64').toString(), '2001:db8:ff:abc:def:123b:456c:78d/64');
         done();
     })
 
@@ -415,6 +429,11 @@ describe('ipaddr', () => {
         assert.equal(ipaddr.IPv6.parse('64:ff9b::1234').range(), 'rfc6052');
         assert.equal(ipaddr.IPv6.parse('2002:1f63:45e8::1').range(), '6to4');
         assert.equal(ipaddr.IPv6.parse('2001::4242').range(), 'teredo');
+        assert.equal(ipaddr.IPv6.parse('2001:2::').range(), 'benchmarking');
+        assert.equal(ipaddr.IPv6.parse('2001:3::').range(), 'amt');
+        assert.equal(ipaddr.IPv6.parse('2001:4:112::').range(), 'as112v6');
+        assert.equal(ipaddr.IPv6.parse('2001:10::').range(), 'deprecated');
+        assert.equal(ipaddr.IPv6.parse('2001:20::').range(), 'orchid2');
         assert.equal(ipaddr.IPv6.parse('2001:db8::3210').range(), 'reserved');
         assert.equal(ipaddr.IPv6.parse('2001:470:8:66::1').range(), 'unicast');
         assert.equal(ipaddr.IPv6.parse('2001:470:8:66::1%z').range(), 'unicast');
@@ -627,6 +646,23 @@ describe('ipaddr', () => {
         done();
     })
 
+    it('subnetMaskFromPrefixLength returns correct IPv6 subnet mask given prefix length', (done) => {
+        assert.equal(ipaddr.IPv6.subnetMaskFromPrefixLength(128), 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff');
+        assert.equal(ipaddr.IPv6.subnetMaskFromPrefixLength(112), 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:0');
+        assert.equal(ipaddr.IPv6.subnetMaskFromPrefixLength(96),  'ffff:ffff:ffff:ffff:ffff:ffff::');
+        assert.equal(ipaddr.IPv6.subnetMaskFromPrefixLength(72),  'ffff:ffff:ffff:ffff:ff00::');
+        assert.equal(ipaddr.IPv6.subnetMaskFromPrefixLength(64),  'ffff:ffff:ffff:ffff::');
+        assert.equal(ipaddr.IPv6.subnetMaskFromPrefixLength(48),  'ffff:ffff:ffff::');
+        assert.equal(ipaddr.IPv6.subnetMaskFromPrefixLength(32),  'ffff:ffff::');
+        assert.equal(ipaddr.IPv6.subnetMaskFromPrefixLength(16),  'ffff::');
+        assert.equal(ipaddr.IPv6.subnetMaskFromPrefixLength(8),   'ff00::');
+        assert.equal(ipaddr.IPv6.subnetMaskFromPrefixLength(4),   'f000::');
+        assert.equal(ipaddr.IPv6.subnetMaskFromPrefixLength(2),   'c000::');
+        assert.equal(ipaddr.IPv6.subnetMaskFromPrefixLength(1),   '8000::');
+        assert.equal(ipaddr.IPv6.subnetMaskFromPrefixLength(0),   '::');
+        done();
+    })
+
     it('broadcastAddressFromCIDR returns correct IPv4 broadcast address', (done) => {
         assert.equal(ipaddr.IPv4.broadcastAddressFromCIDR('172.0.0.1/24'), '172.0.0.255');
         assert.equal(ipaddr.IPv4.broadcastAddressFromCIDR('172.0.0.1/26'), '172.0.0.63');
@@ -638,4 +674,31 @@ describe('ipaddr', () => {
         assert.equal(ipaddr.IPv4.networkAddressFromCIDR('172.0.0.1/5'), '168.0.0.0');
         done();
     })
+
+    it('networkAddressFromCIDR returns correct IPv6 network address', (done) => {
+        assert.equal(ipaddr.IPv6.networkAddressFromCIDR('::/0'),                  '::');
+        assert.equal(ipaddr.IPv6.networkAddressFromCIDR('2001:db8:f53a::1:1/64'), '2001:db8:f53a::');
+        assert.equal(ipaddr.IPv6.networkAddressFromCIDR('2001:db8:f53b::1:1/48'), '2001:db8:f53b::');
+        assert.equal(ipaddr.IPv6.networkAddressFromCIDR('2001:db8:f531::1:1/44'), '2001:db8:f530::');
+        assert.equal(ipaddr.IPv6.networkAddressFromCIDR('2001:db8:f500::1/40'),   '2001:db8:f500::');
+        assert.equal(ipaddr.IPv6.networkAddressFromCIDR('2001:db8:f500::1%z/40'), '2001:db8:f500::');
+        assert.equal(ipaddr.IPv6.networkAddressFromCIDR('2001:db9:f500::1/40'),   '2001:db9:f500::');
+        assert.equal(ipaddr.IPv6.networkAddressFromCIDR('2001:db9:f500::1%z/40'), '2001:db9:f500::');
+        assert.equal(ipaddr.IPv6.networkAddressFromCIDR('2001:db8:f53a::1/128'),  '2001:db8:f53a::1');
+        done();
+    })
+
+    it('broadcastAddressFromCIDR returns correct IPv6 broadcast address', (done) => {
+        assert.equal(ipaddr.IPv6.broadcastAddressFromCIDR('::/0'),                  'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff');
+        assert.equal(ipaddr.IPv6.broadcastAddressFromCIDR('2001:db8:f53a::1:1/64'), '2001:db8:f53a:0:ffff:ffff:ffff:ffff');
+        assert.equal(ipaddr.IPv6.broadcastAddressFromCIDR('2001:db8:f53b::1:1/48'), '2001:db8:f53b:ffff:ffff:ffff:ffff:ffff');
+        assert.equal(ipaddr.IPv6.broadcastAddressFromCIDR('2001:db8:f531::1:1/44'), '2001:db8:f53f:ffff:ffff:ffff:ffff:ffff');
+        assert.equal(ipaddr.IPv6.broadcastAddressFromCIDR('2001:db8:f500::1/40'),   '2001:db8:f5ff:ffff:ffff:ffff:ffff:ffff');
+        assert.equal(ipaddr.IPv6.broadcastAddressFromCIDR('2001:db8:f500::1%z/40'), '2001:db8:f5ff:ffff:ffff:ffff:ffff:ffff');
+        assert.equal(ipaddr.IPv6.broadcastAddressFromCIDR('2001:db9:f500::1/40'),   '2001:db9:f5ff:ffff:ffff:ffff:ffff:ffff');
+        assert.equal(ipaddr.IPv6.broadcastAddressFromCIDR('2001:db9:f500::1%z/40'), '2001:db9:f5ff:ffff:ffff:ffff:ffff:ffff');
+        assert.equal(ipaddr.IPv6.broadcastAddressFromCIDR('2001:db8:f53a::1/128'),  '2001:db8:f53a::1');
+        done();
+    })
+
 })
