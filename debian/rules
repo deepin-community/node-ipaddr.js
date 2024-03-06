@@ -8,4 +8,4 @@
 	dh $@
 
 override_dh_auto_build:
-	cd lib && uglifyjs.terser -o ../debian/ipaddr.min.js ipaddr.js
+	cd lib && terser -o ../debian/ipaddr.min.js ipaddr.js

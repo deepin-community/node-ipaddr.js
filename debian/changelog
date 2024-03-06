@@ -1,3 +1,38 @@
+node-ipaddr.js (2.1.0~dfsg-1) unstable; urgency=medium
+ 
+  * Team upload 
+  * New upstream version 2.1.0~dfsg
+  * Updated standards-version
+  * Updated copyright
+
+ -- Robinson Uchechukwu <estherchidinma202@gmail.com>  Sat, 28 Oct 2023 11:47:22 +0000
+
+node-ipaddr.js (2.0.1~dfsg-3) unstable; urgency=medium
+
+  * Team upload
+  * Fix d/control for Debian::Control (Closes: #1006079)
+
+ -- Yadd <yadd@debian.org>  Sat, 19 Feb 2022 08:59:43 +0100
+
+node-ipaddr.js (2.0.1~dfsg-2) unstable; urgency=medium
+
+  * team upload
+
+  * use and build-depend on terser (not uglifyjs.terser)
+
+ -- Jonas Smedegaard <dr@jones.dk>  Thu, 02 Dec 2021 20:51:04 +0100
+
+node-ipaddr.js (2.0.1~dfsg-1) unstable; urgency=medium
+
+  * Fix GitHub tags regex
+  * Uploaders: replace Leo Iannacone by myself, thanks for your work!
+  * Update standards version to 4.6.0, no changes needed.
+  * Fix filenamemangle
+  * Drop dependency to nodejs
+  * New upstream version 2.0.1~dfsg
+
+ -- Yadd <yadd@debian.org>  Wed, 24 Nov 2021 18:13:52 +0100
+
 node-ipaddr.js (2.0.0~dfsg-1) unstable; urgency=medium
 
   * Team upload
